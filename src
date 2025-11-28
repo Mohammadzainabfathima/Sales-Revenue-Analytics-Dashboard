@@ -1,0 +1,34 @@
+data_preprossesing---
+import pandas as pd
+
+def load_data(path):
+    return pd.read_csv(path)
+
+def preprocess(df):
+    df['Date'] = pd.to_datetime(df['Date'])
+    df['Revenue'] = df['Quantity'] * df['UnitPrice']
+    return df
+
+def summarize(df):
+    summary = {
+        'total_revenue': df['Revenue'].sum(),
+        'total_quantity': df['Quantity'].sum(),
+        'unique_products': df['Product'].nunique(),
+    }
+    return summary
+
+
+Visualisation---
+mport plotly.express as px
+
+def plot_revenue_trend(df):
+    return px.line(df.groupby('Date')['Revenue'].sum().reset_index(),
+                   x='Date', y='Revenue', title='Daily Revenue Trend')
+
+def plot_top_products(df):
+    top = df.groupby('Product')['Revenue'].sum().reset_index().sort_values(by='Revenue', ascending=False).head(10)
+    return px.bar(top, x='Product', y='Revenue', title='Top Products by Revenue')
+
+def plot_region_sales(df):
+    region = df.groupby('Region')['Revenue'].sum().reset_index()
+    return px.pie(region, names='Region', values='Revenue', title='Revenue by Region')
